@@ -1,54 +1,57 @@
 package com.moberg.twittercase.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
-import com.moberg.twittercase.exceptions.InternalServerException;
 
 import twitter4j.Query;
 import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
-
 
 @Service
 public class TwitterServiceImpl implements TwitterService {
-	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private Twitter twitter;
+
 	
 	@Autowired
-	private Environment env;
-	
-	@PostConstruct
-	private void initService() {
-		try {
-			twitter = new TwitterFactory().getInstance();
-			AccessToken accessToken = new AccessToken(env.getProperty("twitter.access.token"), env.getProperty("twitter.access.secret"));
-		    twitter.setOAuthConsumer(env.getProperty("twitter.consumer.key"), env.getProperty("twitter.consumer.secret"));
-		    twitter.setOAuthAccessToken(accessToken);
-		} catch(Exception e) {
-			logger.error("Failed to initilize twitter authentication", e);
-		}
-	}
+	private Twitter4JService twitter4jService;
 	
 	@Override
-	public List<Status> sendQuery(Query query) {
-		try {
-			return twitter.search(query).getTweets();
-	    } catch (TwitterException e) {
-	    	throw new InternalServerException(e);
-	    }
+	public List<TwitterWord> getTopWordsForHashtag(String hashtag, int nrOfResults) {
+		List<Status> tweets = twitter4jService.sendQuery(new Query(hashtag));
+		return determineTwitterWordCount(tweets, nrOfResults);
+	}
 
+	private List<TwitterWord> determineTwitterWordCount(List<Status> tweets, int nrOfResults) {
+		List<String> tweetWords = new ArrayList<>();
+		List<TwitterWord> twitterWords = new ArrayList<>();
+		
+		// Get List of all words
+		tweets.forEach(tweet -> {
+    	   if(tweet.getText() != null) {
+    		   tweetWords.addAll(Arrays.asList(tweet.getText().toLowerCase().split(" ")));
+    	   }
+		});
+       
+       // Get map of word and count
+       Map<String, Long> tweetWordMap = 
+       		tweetWords.stream().collect(
+       				Collectors.groupingBy(
+       						Function.identity(), Collectors.counting()));
+       
+       // Sort, limit and add to resulting list
+       tweetWordMap.entrySet().stream()
+       		.sorted((a,b) -> b.getValue().compareTo(a.getValue())) 
+       		.limit(nrOfResults)
+       		.forEach(item -> {
+       			twitterWords.add(new TwitterWord(item.getKey(), item.getValue()));
+       		});
+       
+       return twitterWords;
 	}
 
 }

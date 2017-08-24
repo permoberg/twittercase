@@ -1,4 +1,4 @@
-package com.moberg.twittercase.twittercase;
+package com.moberg.twittercase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

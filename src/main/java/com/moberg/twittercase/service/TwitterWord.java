@@ -13,7 +13,8 @@ public class TwitterWord implements Serializable {
 	}
 
 	public TwitterWord(String word, Long count) {
-		// Empty constructor for JSON
+		this.word = word;
+		this.count = count;
 	}
 	
 	public String getWord() {
