@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.moberg.twittercase.service.TwitterService;
 import com.moberg.twittercase.service.TwitterWord;
+import com.moberg.twittercase.util.InputValidator;
+import com.moberg.twittercase.util.InputValidator.InputType;
 
 @Controller
 @RequestMapping("/twitter")
@@ -24,9 +26,10 @@ public class TwitterController {
 	public List<TwitterWord> twitter(@PathVariable("hashtag") String hashtag) {
 		
 		// Input validation
+		InputValidator.validate(hashtag, InputType.HASHTAG);
 		
 		// Send request
-		return twitterService.getTopWordsForHashtag(hashtag, 100);
+		return twitterService.getTopWordsForHashtag("#" + hashtag, 100);
 		
 	}
 	
@@ -35,10 +38,14 @@ public class TwitterController {
 	public List<TwitterWord> twitter(@PathVariable("hashtag") String hashtag, @PathVariable("nrOfResults") String nrOfResultsStr) {
 		
 		// Input validation
+		InputValidator.validate(hashtag, InputType.HASHTAG);
+		InputValidator.validate(nrOfResultsStr, InputType.POSITIVE_NUMBER);
+		
+		// Convert to int
 		int nrOfResults = Integer.valueOf(nrOfResultsStr);
 		
 		// Send request
-		return twitterService.getTopWordsForHashtag(hashtag, nrOfResults);
+		return twitterService.getTopWordsForHashtag("#" + hashtag, nrOfResults);
 		
 	}
 	

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.moberg.twittercase.exceptions.InternalServerException;
 
+import twitter4j.GeoLocation;
 import twitter4j.Query;
+import twitter4j.Query.Unit;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -44,12 +46,26 @@ public class Twitter4JServiceImpl implements Twitter4JService {
 	@Override
 	public List<Status> sendQuery(Query query) {
 		try {
+			setGeoLocation(query);
+			setCount(query);
 			return twitter.search(query).getTweets();
 	    } catch (TwitterException e) {
 	    	logger.error("Exception thrown from twitter", e);
 	    	throw new InternalServerException(e);
 	    }
 
+	}
+	
+	private void setGeoLocation(Query query) {
+		double latitud = Double.valueOf(env.getProperty("twitter.latitude"));
+		double longitud = Double.valueOf(env.getProperty("twitter.longitude"));
+		double radius = Double.valueOf(env.getProperty("twitter.radius"));
+		query.setGeoCode(new GeoLocation(latitud, longitud), radius, Unit.km);
+	}
+	
+	private void setCount(Query query) {
+		int count = Integer.valueOf(env.getProperty("twitter.count"));
+		query.setCount(count);
 	}
 
 }

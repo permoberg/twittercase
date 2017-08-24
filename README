@@ -1,3 +1,13 @@
 To start application type
 
-mvn clean spring-boot:run
+	mvn clean spring-boot:run
+	
+Go to your favorit browser and use this command to get the 100 most used words for a specific hashtag
+Type the hashtag without leading #.
+
+	http://localhost:8080/twitter/{hashtag}
+
+You can use the following to get a custom number of most used words for a specific hashtag
+
+	http://localhost:8080/twitter/{hashtag}/{nrOfResults}
+
