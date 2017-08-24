@@ -48,7 +48,7 @@ public class TwitterServiceImpl implements TwitterService {
        		.sorted((a,b) -> b.getValue().compareTo(a.getValue())) 
        		.limit(nrOfResults)
        		.forEach(item -> {
-       			twitterWords.add(new TwitterWord(item.getKey(), item.getValue()));
+       			twitterWords.add(new TwitterWord(item.getKey(), item.getValue().intValue()));
        		});
        
        return twitterWords;

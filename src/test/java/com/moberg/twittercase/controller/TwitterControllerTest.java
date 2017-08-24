@@ -1,21 +1,38 @@
 package com.moberg.twittercase.controller;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.moberg.twittercase.exceptions.InternalServerException;
+import com.moberg.twittercase.exceptions.InvalidInputException;
 import com.moberg.twittercase.service.TwitterService;
+import com.moberg.twittercase.service.TwitterWord;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(TwitterController.class)
 public class TwitterControllerTest {
 
 	private static final String HASHTAG = "myTag";
+	private static final String WORD = "word";
+	private static final int COUNT = 10;
 	private static final int DEFAULT_NR_RESULT = 100;
+	private static final int CUSTOM_NR_RESULT = 33;
 	
 	@Autowired
     private MockMvc mockMvc;
@@ -24,17 +41,78 @@ public class TwitterControllerTest {
 	private TwitterService twitterService;
 	
     @Test
-    public void testSayHelloWorld() throws Exception {
+    public void twitterHappyCase() throws Exception {
         
-//    	when(twitterService.getTopWordsForHashtag(HASHTAG, DEFAULT_NR_RESULT)).thenReturn(ArrayList<TwitterWord>());
-//    	
-//    	
-//    	MockMvcRequestBuilders.get("/twitter/weather")
-//    	
-//    	this.mockMvc.perform(get("/").accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType("application/json"));
-
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, DEFAULT_NR_RESULT)).thenReturn(Arrays.asList(new TwitterWord(WORD, COUNT)));
+    	
+    	RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/twitter/" + HASHTAG).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$[0].word", is(WORD)))
+    			.andExpect(jsonPath("$[0].count", is(COUNT)));
+    }
+    
+    @Test
+    public void twitterInternalServerError() throws Exception {
+        
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, DEFAULT_NR_RESULT)).thenThrow(new InternalServerException());
+    	
+    	RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/twitter/" + HASHTAG).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isInternalServerError());
+    }
+    
+    @Test
+    public void twitterInvalidInputError() throws Exception {
+        
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, DEFAULT_NR_RESULT)).thenThrow(new InvalidInputException());
+    	
+    	RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/twitter/" + HASHTAG).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    public void twitterCustomCountHappyCase() throws Exception {
+        
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, CUSTOM_NR_RESULT)).thenReturn(Arrays.asList(new TwitterWord(WORD, COUNT)));
+    	
+    	RequestBuilder requestBuilder = 
+    			MockMvcRequestBuilders.get("/twitter/" + HASHTAG + "/" + CUSTOM_NR_RESULT).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$[0].word", is(WORD)))
+    			.andExpect(jsonPath("$[0].count", is(COUNT)));
+    }
+    
+    @Test
+    public void twitterCustomCountInternalServerError() throws Exception {
+        
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, CUSTOM_NR_RESULT)).thenThrow(new InternalServerException());
+    	
+    	RequestBuilder requestBuilder = 
+    			MockMvcRequestBuilders.get("/twitter/" + HASHTAG + "/" + CUSTOM_NR_RESULT).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isInternalServerError());
+    }
+    
+    @Test
+    public void twitterCustomCountInvalidInputError() throws Exception {
+        
+    	when(twitterService.getTopWordsForHashtag(HASHTAG, CUSTOM_NR_RESULT)).thenThrow(new InvalidInputException());
+    	
+    	RequestBuilder requestBuilder = 
+    			MockMvcRequestBuilders.get("/twitter/" + HASHTAG + "/" + CUSTOM_NR_RESULT).accept(MediaType.APPLICATION_JSON_UTF8);
+    	
+    	this.mockMvc.perform(requestBuilder)
+                .andExpect(status().isBadRequest());
     }
 	
 }

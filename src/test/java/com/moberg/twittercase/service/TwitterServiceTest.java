@@ -63,15 +63,15 @@ public class TwitterServiceTest {
 		
 		assertThat(result.size(), is(5));
 		assertThat(result.get(0).getWord(), is("a"));
-		assertThat(result.get(0).getCount(), is(8L));
+		assertThat(result.get(0).getCount(), is(8));
 		assertThat(result.get(1).getWord(), is("q"));
-		assertThat(result.get(1).getCount(), is(6L));
+		assertThat(result.get(1).getCount(), is(6));
 		assertThat(result.get(2).getWord(), is("c"));
-		assertThat(result.get(2).getCount(), is(5L));
+		assertThat(result.get(2).getCount(), is(5));
 		assertThat(result.get(3).getWord(), is("g"));
-		assertThat(result.get(3).getCount(), is(1L));
+		assertThat(result.get(3).getCount(), is(1));
 		assertThat(result.get(4).getWord(), is("i"));
-		assertThat(result.get(4).getCount(), is(1L));
+		assertThat(result.get(4).getCount(), is(1));
 		
 	}
 	
@@ -81,9 +81,9 @@ public class TwitterServiceTest {
 		
 		assertThat(result.size(), is(2));
 		assertThat(result.get(0).getWord(), is("a"));
-		assertThat(result.get(0).getCount(), is(8L));
+		assertThat(result.get(0).getCount(), is(8));
 		assertThat(result.get(1).getWord(), is("q"));
-		assertThat(result.get(1).getCount(), is(6L));
+		assertThat(result.get(1).getCount(), is(6));
 		
 	}
 	

@@ -6,13 +6,13 @@ public class TwitterWord implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String word;
-	private Long count;
+	private int count;
 	
 	public TwitterWord() {
 		// Empty constructor for JSON
 	}
 
-	public TwitterWord(String word, Long count) {
+	public TwitterWord(String word, int count) {
 		this.word = word;
 		this.count = count;
 	}
@@ -25,11 +25,11 @@ public class TwitterWord implements Serializable {
 		this.word = word;
 	}
 
-	public Long getCount() {
+	public int getCount() {
 		return count;
 	}
 
-	public void setCount(Long count) {
+	public void setCount(int count) {
 		this.count = count;
 	}
 
