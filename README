@@ -1,0 +1,3 @@
+To start application type
+
+mvn clean spring-boot:run
