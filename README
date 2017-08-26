@@ -1,6 +1,6 @@
-To start application type
+To start application type in project root
 
-	mvn clean spring-boot:run
+	mvn spring-boot:run
 	
 Go to your favorit browser and use this command to get the 100 most used words for a specific hashtag
 Type the hashtag without leading #.
