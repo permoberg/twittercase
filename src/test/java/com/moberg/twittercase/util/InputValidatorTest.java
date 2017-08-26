@@ -62,9 +62,9 @@ public class InputValidatorTest {
 	
 	@Test
 	public void validPositiveNumber() {
-		InputValidator.validate("1", InputType.POSITIVE_NUMBER);
-		InputValidator.validate("15", InputType.POSITIVE_NUMBER);
-		InputValidator.validate("100", InputType.POSITIVE_NUMBER);
+		InputValidator.validate(Integer.valueOf(1), InputType.POSITIVE_NUMBER);
+		InputValidator.validate(Integer.valueOf(15), InputType.POSITIVE_NUMBER);
+		InputValidator.validate(Integer.valueOf(100), InputType.POSITIVE_NUMBER);
 	}
 	
 }

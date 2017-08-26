@@ -35,22 +35,15 @@ public class TwitterController {
 	
 	@RequestMapping(value="/{hashtag}/{nrOfResults}", method = RequestMethod.GET, produces="application/json")
 	@ResponseBody
-	public List<TwitterWord> twitter(@PathVariable("hashtag") String hashtag, @PathVariable("nrOfResults") String nrOfResultsStr) {
+	public List<TwitterWord> twitter(@PathVariable("hashtag") String hashtag, @PathVariable("nrOfResults") Integer nrOfResults) {
 		
 		// Input validation
 		InputValidator.validate(hashtag, InputType.HASHTAG);
-		InputValidator.validate(nrOfResultsStr, InputType.POSITIVE_NUMBER);
-		
-		// Convert to int
-		int nrOfResults = Integer.valueOf(nrOfResultsStr);
+		InputValidator.validate(nrOfResults, InputType.POSITIVE_NUMBER);
 		
 		// Send request
 		return twitterService.getTopWordsForHashtag("#" + hashtag, nrOfResults);
 		
 	}
-	
 
-	
 }
-
-

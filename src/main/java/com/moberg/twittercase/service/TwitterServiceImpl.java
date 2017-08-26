@@ -16,7 +16,6 @@ import twitter4j.Status;
 @Service
 public class TwitterServiceImpl implements TwitterService {
 
-	
 	@Autowired
 	private Twitter4JService twitter4jService;
 	
@@ -27,31 +26,26 @@ public class TwitterServiceImpl implements TwitterService {
 	}
 
 	private List<TwitterWord> determineTwitterWordCount(List<Status> tweets, int nrOfResults) {
-		List<String> tweetWords = new ArrayList<>();
-		List<TwitterWord> twitterWords = new ArrayList<>();
 		
 		// Get List of all words
-		tweets.forEach(tweet -> {
-    	   if(tweet.getText() != null) {
-    		   tweetWords.addAll(Arrays.asList(tweet.getText().toLowerCase().split(" ")));
-    	   }
-		});
+		List<String> tweetWordList = tweets.stream()
+				.map(tweet -> tweet.getText() != null ? Arrays.asList(tweet.getText().toLowerCase().split(" ")) : new ArrayList<String>())
+				.flatMap(l -> l.stream())
+				.collect(Collectors.toList());
        
        // Get map of word and count
        Map<String, Long> tweetWordMap = 
-       		tweetWords.stream().collect(
+    		   tweetWordList.stream().collect(
        				Collectors.groupingBy(
        						Function.identity(), Collectors.counting()));
        
        // Sort, limit and add to resulting list
-       tweetWordMap.entrySet().stream()
-       		.sorted((a,b) -> b.getValue().compareTo(a.getValue())) 
-       		.limit(nrOfResults)
-       		.forEach(item -> {
-       			twitterWords.add(new TwitterWord(item.getKey(), item.getValue().intValue()));
-       		});
-       
-       return twitterWords;
+       return tweetWordMap.entrySet().stream()
+    		   .sorted((a,b) -> b.getValue().compareTo(a.getValue())) 
+    		   .limit(nrOfResults)
+    		   .map(entry -> new TwitterWord(entry.getKey(), entry.getValue().intValue()))
+    		   .collect(Collectors.toList());
+
 	}
 
 }

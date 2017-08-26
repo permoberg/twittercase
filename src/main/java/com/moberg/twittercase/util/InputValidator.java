@@ -2,29 +2,24 @@ package com.moberg.twittercase.util;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.moberg.twittercase.exceptions.InvalidInputException;
 
 public class InputValidator {
 
 	// First letter non-numeric
 	// Assuming max 30 characters
+	// Assuming swedish letters
 	// Letters, numbers and underscore is valid
 	private static final Pattern HASHTAG_PATTERN = Pattern.compile("^[a-zåäöA-ZÅÄÖ_]{1}[a-zåäöA-ZÅÄÖ_0-9]{0,29}");
 	
 	private InputValidator() {
-		// Hide constructor
+		// Hidden constructor
 	}
 	
-	public static void validate(String input, InputType type) {
+	public static void validate(Object input, InputType type) {
 		
 		if(type == null) {
-			throw new InternalError("Input type can not be null");
-		}
-		
-		if(StringUtils.isEmpty(input)) {
-			throw new InvalidInputException(input + "is not a valid input");
+			throw new InternalError("Input can not be null");
 		}
 		
 		switch(type) {
@@ -40,14 +35,14 @@ public class InputValidator {
 		
 	}
 	
-	private static void validatePositiveNumber(String input) {
-		if(!StringUtils.isNumeric(input) || Integer.valueOf(input).intValue() <= 0) {
+	private static void validatePositiveNumber(Object input) {
+		if(!(input instanceof Integer && ((Integer)input) > 0)) {
 			throw new InvalidInputException(input + "is not a valid input");
 		}
 	}
 
-	private static void validateHashtag(String input) {
-		if(!HASHTAG_PATTERN.matcher(input).matches()) {
+	private static void validateHashtag(Object input) {
+		if(!(input instanceof String && HASHTAG_PATTERN.matcher((String)input).matches())) {
 			throw new InvalidInputException(input + "is not a valid input");
 		}
 	}

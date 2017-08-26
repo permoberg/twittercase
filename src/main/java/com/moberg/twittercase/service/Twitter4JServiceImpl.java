@@ -5,7 +5,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
@@ -29,7 +28,7 @@ import twitter4j.auth.AccessToken;
 public class Twitter4JServiceImpl implements Twitter4JService {
 	
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private static ExecutorService fixedPool;
+	private ExecutorService fixedPool;
 	private Twitter twitter;
 	
 	@Value("${twitter.latitude}")
@@ -63,8 +62,8 @@ public class Twitter4JServiceImpl implements Twitter4JService {
 	@PostConstruct
 	private void initService() {
 		try {
-			twitter = new TwitterFactory().getInstance();
 			AccessToken accessToken = new AccessToken(twitterToken, twitterSecret);
+			twitter = new TwitterFactory().getInstance();
 		    twitter.setOAuthConsumer(twitterConsumerKey, twitterConsumerSecret);
 		    twitter.setOAuthAccessToken(accessToken);
 		    fixedPool = Executors.newFixedThreadPool(poolSize);
@@ -89,9 +88,8 @@ public class Twitter4JServiceImpl implements Twitter4JService {
 	            }
 	        };
 			
-		    Future<List<Status>> twitterFuture = fixedPool.submit(twitterCallable);
-		    return twitterFuture.get();
-			
+		    return fixedPool.submit(twitterCallable).get();
+		    
 	    } catch (InterruptedException | ExecutionException e) {
 	    	logger.error("Exception thrown from twitter", e);
 	    	throw new InternalServerException(e);
